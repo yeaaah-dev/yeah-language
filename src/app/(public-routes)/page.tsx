@@ -1,3 +1,5 @@
+import { Login } from "@/modules/share/components/Login";
+
 export default function Home() {
-  return <a href="/api/auth/login">Login</a>;
+  return <Login />;
 }
