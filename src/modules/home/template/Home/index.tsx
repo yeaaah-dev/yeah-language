@@ -4,6 +4,7 @@ import Link from "next/link";
 import { tv } from "tailwind-variants";
 import { Unit } from "../../models/Unit";
 import { useState } from "react";
+import { Modal } from "@/modules/share/components/Modal";
 
 interface HomeTemplateProps {
   units: Unit[];
@@ -37,7 +38,7 @@ export function HomeTemplate({ units }: HomeTemplateProps) {
 
   return (
     <section className="max-w-5xl p-1 m-auto">
-      <div className="grid grid-cols-3 gap-4 my-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-10">
         {units.map((unit) => (
           <Link
             key={unit.id}

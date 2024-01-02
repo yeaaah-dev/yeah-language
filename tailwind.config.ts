@@ -9,6 +9,25 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      keyframes: {
+        "overlay-fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "0.8" },
+        },
+        "modal-content-fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "modal-content-fade-out": {
+          "0%": { opacity: "1" },
+          "100%": { opacity: "0" },
+        },
+      },
+      animation: {
+        "overlay-fade-in": "overlay-fade-in 0.5s ease-in-out",
+        "modal-content-fade-in": "modal-content-fade-in 0.5s ease-in-out",
+        "modal-content-fade-out": "modal-content-fade-out 0.5s ease-in-out",
+      },
       colors: {
         ...colors,
         "gray-primary": "#E1E1E1",
