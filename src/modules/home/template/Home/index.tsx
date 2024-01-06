@@ -4,7 +4,7 @@ import Link from "next/link";
 import { tv } from "tailwind-variants";
 import { Unit } from "../../models/Unit";
 import { useState } from "react";
-import { Modal } from "@/modules/share/components/Modal";
+import { generateSlug } from "@/tools/generateSlug";
 
 interface HomeTemplateProps {
   units: Unit[];
@@ -33,21 +33,33 @@ const card = tv({
 });
 
 export function HomeTemplate({ units }: HomeTemplateProps) {
-  const [isDisabled, setIsDisabled] = useState<number>(1);
+  const [isDisabled, setIsDisabled] = useState<number>(7);
   const { container, subTitle, title } = card();
 
   return (
     <section className="max-w-5xl p-1 m-auto">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-10">
         {units.map((unit) => (
-          <Link
-            key={unit.id}
-            href="#"
-            className={container({ disabled: unit.id > isDisabled })}
-          >
-            <span className={title()}>{unit.title}</span>
-            <span className={subTitle()}>{unit.contents.join(", ")}</span>
-          </Link>
+          <>
+            {unit.id <= isDisabled ? (
+              <Link
+                key={unit.id}
+                href={`/challenge/${generateSlug(unit.title)}`}
+                className={container({ disabled: unit.id > isDisabled })}
+              >
+                <span className={title()}>{unit.title}</span>
+                <span className={subTitle()}>{unit.contents.join(", ")}</span>
+              </Link>
+            ) : (
+              <div
+                key={unit.id}
+                className={container({ disabled: unit.id > isDisabled })}
+              >
+                <span className={title()}>{unit.title}</span>
+                <span className={subTitle()}>{unit.contents.join(", ")}</span>
+              </div>
+            )}
+          </>
         ))}
       </div>
     </section>
