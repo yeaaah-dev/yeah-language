@@ -38,18 +38,18 @@ interface AddStartProps {
   wordRefPosition: DOMRect;
   containerRefPosition: DOMRect;
   wordRef: HTMLDivElement;
-  word: string;
+  wordItem: RandomWords;
 }
 
 interface AddEndProps {
   wordRefPosition: DOMRect;
   wordRef: HTMLDivElement;
-  word: string;
+  wordItem: RandomWords;
   lastWordSelected: HTMLDivElement;
 }
 
 export function ReadOrListen({ chat }: ReadOrListenProps) {
-  const [selectedWords, setSelectedWords] = useState<string[]>([]);
+  const [selectedWords, setSelectedWords] = useState<RandomWords[]>([]);
   const [sentence, setSentence] = useState<Sentence>({} as Sentence);
   const containerRef = useRef<HTMLHRElement | null>(null);
   const wordsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -87,9 +87,9 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
     return words;
   }
 
-  function updateSelectedWord(word: string, wordRef: HTMLDivElement) {
+  function updateSelectedWord(wordItem: RandomWords, wordRef: HTMLDivElement) {
     setTimeout(() => {
-      setSelectedWords([...selectedWords, word]);
+      setSelectedWords([...selectedWords, wordItem]);
       wordRef.style.display = "none";
     }, 300);
   }
@@ -98,7 +98,7 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
     containerRefPosition,
     wordRefPosition,
     wordRef,
-    word,
+    wordItem,
   }: AddStartProps) {
     const y =
       wordRefPosition.y - containerRefPosition.y + wordRefPosition.height + 6;
@@ -106,11 +106,11 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
     const x = wordRefPosition.x - containerRefPosition.x;
 
     wordRef.style.transform = `translate(-${x}px, -${y}px)`;
-    updateSelectedWord(word, wordRef);
+    updateSelectedWord(wordItem, wordRef);
   }
 
   function addEnd({
-    word,
+    wordItem,
     wordRef,
     wordRefPosition,
     lastWordSelected,
@@ -131,10 +131,10 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
     }
 
     wordRef.style.transform = translate;
-    updateSelectedWord(word, wordRef);
+    updateSelectedWord(wordItem, wordRef);
   }
 
-  function handleSelectedWord(word: string, index: number) {
+  function handleSelectedWord(wordItem: RandomWords, index: number) {
     if (!containerRef.current) return;
     if (!wordsRef.current) return;
 
@@ -147,7 +147,7 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
     const wordRefPosition = wordRef.getBoundingClientRect();
 
     if (selectedWords.length === 0) {
-      addStart({ containerRefPosition, wordRefPosition, wordRef, word });
+      addStart({ containerRefPosition, wordRefPosition, wordRef, wordItem });
       return;
     }
 
@@ -159,17 +159,30 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
     addEnd({
       wordRefPosition,
       wordRef,
-      word,
+      wordItem,
       lastWordSelected,
     });
   }
 
   function verifyWordSelected(word: string): boolean {
-    return selectedWords.includes(word);
+    return selectedWords.filter((item) => item.word === word).length > 0;
   }
 
-  function removeWordSelected(word: string) {
-    const selectedWordsFiltered = selectedWords.filter((item) => item !== word);
+  function removeWordSelected(wordItem: RandomWords) {
+    const selectedWordsFiltered = selectedWords.filter(
+      (item) => item.id !== wordItem.id
+    );
+
+    const wordIndex = sentence.randomWords.findIndex(
+      (word) => word.id === wordItem.id
+    );
+
+    const wordRef = wordsRef.current[wordIndex];
+
+    if (!wordRef) return;
+
+    wordRef.style.display = "block";
+    wordRef.style.transform = `translate(0px, 0px)`;
 
     setSelectedWords(selectedWordsFiltered);
   }
@@ -197,7 +210,7 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
         <div className="mt-1 flex flex-wrap gap-2 min-h-12">
           {selectedWords.map((word) => (
             <div
-              key={word}
+              key={word.id}
               ref={(element) => {
                 if (!element || wordsSelectedRef.current.includes(element))
                   return;
@@ -205,7 +218,9 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
                 wordsSelectedRef.current.push(element);
               }}
             >
-              <Tag handleClick={() => removeWordSelected(word)}>{word}</Tag>
+              <Tag handleClick={() => removeWordSelected(word)}>
+                {word.word}
+              </Tag>
             </div>
           ))}
         </div>
@@ -226,9 +241,7 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
                 >
                   <Tag
                     selected={verifyWordSelected(randomWord.word)}
-                    handleClick={() =>
-                      handleSelectedWord(randomWord.word, index)
-                    }
+                    handleClick={() => handleSelectedWord(randomWord, index)}
                   >
                     {randomWord.word}
                   </Tag>
@@ -240,9 +253,7 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
                 >
                   <Tag
                     selected={true}
-                    handleClick={() =>
-                      handleSelectedWord(randomWord.word, index)
-                    }
+                    handleClick={() => handleSelectedWord(randomWord, index)}
                   >
                     {randomWord.word}
                   </Tag>
