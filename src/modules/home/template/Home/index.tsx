@@ -39,7 +39,7 @@ export function HomeTemplate({ units }: HomeTemplateProps) {
   return (
     <section className="max-w-5xl p-1 m-auto">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-10">
-        {units.map((unit) => (
+        {units.map((unit, index) => (
           <>
             {unit.id <= isDisabled ? (
               <Link
@@ -52,7 +52,7 @@ export function HomeTemplate({ units }: HomeTemplateProps) {
               </Link>
             ) : (
               <div
-                key={unit.id}
+                key={unit.id + index}
                 className={container({ disabled: unit.id > isDisabled })}
               >
                 <span className={title()}>{unit.title}</span>

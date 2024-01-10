@@ -37,6 +37,7 @@ const config: Config = {
         "button-primary": "0px 4px 0px 0px #489D26;",
         "button-secondary": " 0px 2px 0px 0px #E1E1E1;",
         "button-error": "0px 4px 0px 0px #EE282D;",
+        "tag-blue": "0px 4px 0px 0px #1899D6;",
       },
       colors: {
         ...colors,
