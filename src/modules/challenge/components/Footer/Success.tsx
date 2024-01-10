@@ -1,7 +1,11 @@
 import { Button } from "@/modules/share/components/Button";
 import { CheckFat, Flag } from "@phosphor-icons/react/dist/ssr";
 
-export function Success() {
+interface SuccessProps {
+  handleClick: () => void;
+}
+
+export function Success({ handleClick }: SuccessProps) {
   return (
     <div className="max-w-5xl px-4 mx-auto flex justify-between items-center h-full">
       <div className="flex items-center gap-3">
@@ -20,7 +24,7 @@ export function Success() {
       </div>
 
       <div className="w-36">
-        <Button>Continue</Button>
+        <Button onClick={handleClick}>Continue</Button>
       </div>
     </div>
   );

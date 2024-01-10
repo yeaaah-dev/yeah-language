@@ -23,6 +23,9 @@ const words = [
 
 interface ReadOrListenProps {
   chat: Chat;
+  shouldCleanValues: boolean;
+  speak: (text: string, rate?: number) => void;
+  handleSelectedSentence: (selectedSentence: string) => void;
 }
 
 interface RandomWords {
@@ -48,7 +51,12 @@ interface AddEndProps {
   lastWordSelected: HTMLDivElement;
 }
 
-export function ReadOrListen({ chat }: ReadOrListenProps) {
+export function ReadOrListen({
+  chat,
+  shouldCleanValues,
+  speak,
+  handleSelectedSentence,
+}: ReadOrListenProps) {
   const [selectedWords, setSelectedWords] = useState<RandomWords[]>([]);
   const [sentence, setSentence] = useState<Sentence>({} as Sentence);
   const containerRef = useRef<HTMLHRElement | null>(null);
@@ -61,8 +69,6 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
       chat?.portuguese + " " + chat?.randomPortuguese
     );
 
-    // Ele trabalha aos sábados?Ela não viaja com frequência.
-
     const sentenceGenerated = {
       ...chat,
       randomWords,
@@ -70,6 +76,19 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
 
     setSentence(sentenceGenerated);
   }, [chat]);
+
+  useEffect(() => {
+    if (!shouldCleanValues) return;
+
+    setSelectedWords([]);
+    setSentence({} as Sentence);
+    wordsRef.current = [];
+    wordsSelectedRef.current = [];
+  }, [shouldCleanValues]);
+
+  function generateSelectedWordsToSentence(value: RandomWords[]): string {
+    return value.map((value) => value.word).join(" ");
+  }
 
   function generateRandomWords(sentenceValue: string): RandomWords[] {
     if (!sentenceValue) return [];
@@ -89,8 +108,11 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
 
   function updateSelectedWord(wordItem: RandomWords, wordRef: HTMLDivElement) {
     setTimeout(() => {
-      setSelectedWords([...selectedWords, wordItem]);
+      const wordsSelected = [...selectedWords, wordItem];
       wordRef.style.display = "none";
+
+      setSelectedWords(wordsSelected);
+      handleSelectedSentence(generateSelectedWordsToSentence(wordsSelected));
     }, 300);
   }
 
@@ -164,8 +186,8 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
     });
   }
 
-  function verifyWordSelected(word: string): boolean {
-    return selectedWords.filter((item) => item.word === word).length > 0;
+  function verifyWordSelected(id: string): boolean {
+    return selectedWords.filter((item) => item.id === id).length > 0;
   }
 
   function removeWordSelected(wordItem: RandomWords) {
@@ -184,6 +206,9 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
     wordRef.style.display = "block";
     wordRef.style.transform = `translate(0px, 0px)`;
 
+    handleSelectedSentence(
+      generateSelectedWordsToSentence(selectedWordsFiltered)
+    );
     setSelectedWords(selectedWordsFiltered);
   }
 
@@ -197,11 +222,13 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
         <div className="flex items-center gap-2">
           <Image src="/ana.png" alt="Ana piture" height={169} width={114} />
           <div className="flex items-center gap-2 border-2 border-gray-300 py-[14px] px-[26px] rounded-2xl">
-            <SpeakerSimpleHigh
-              size={32}
-              className="text-blue-primary focus:text-gray-600"
-              weight="fill"
-            />
+            <button onClick={() => speak(sentence.english)}>
+              <SpeakerSimpleHigh
+                size={32}
+                className="text-blue-primary focus:text-gray-600"
+                weight="fill"
+              />
+            </button>
             <span>{sentence.english}</span>
           </div>
         </div>
@@ -240,7 +267,6 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
                   className="transition-all duration-300"
                 >
                   <Tag
-                    selected={verifyWordSelected(randomWord.word)}
                     handleClick={() => handleSelectedWord(randomWord, index)}
                   >
                     {randomWord.word}
@@ -248,7 +274,7 @@ export function ReadOrListen({ chat }: ReadOrListenProps) {
                 </div>
 
                 <div
-                  data-disabled={verifyWordSelected(randomWord.word)}
+                  data-disabled={verifyWordSelected(randomWord.id)}
                   className="data-[disabled=true]:block data-[disabled=false]:hidden"
                 >
                   <Tag
