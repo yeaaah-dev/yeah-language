@@ -121,6 +121,14 @@ export function TemplateChallenge({
     new Audio(`/${name}.wav`).play();
   }
 
+  function skip() {
+    setShouldCleanValues(true);
+
+    setTimeout(() => {
+      getRandomSentence();
+    }, 300);
+  }
+
   return (
     <div className="min-h-full w-full mx-aut mt-10 h-screen">
       <div className="max-w-5xl flex md:gap-5 justify-between items-center flex-1 mx-auto w-full px-4">
@@ -213,7 +221,7 @@ export function TemplateChallenge({
 
       <Footer variant={footerVariant}>
         {footerVariant === FooterVariant.NORMAL && (
-          <Footer.Normal handleCheck={checkCorrectSentence} />
+          <Footer.Normal handleCheck={checkCorrectSentence} skip={skip} />
         )}
 
         {footerVariant === FooterVariant.SUCCESS && (

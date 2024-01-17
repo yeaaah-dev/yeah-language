@@ -36,10 +36,13 @@ export async function POST(req: Request) {
       ],
     });
 
+    console.log(response);
+
     return NextResponse.json(
       JSON.parse(response.choices[0].message.content || "")
     );
   } catch (error) {
+    console.log(error);
     return NextResponse.json("", { status: 500 });
   }
 }
